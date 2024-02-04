@@ -1,0 +1,64 @@
+
+Load dataset
+
+import pandas as pd
+
+file_path = 'Bengaluru_House_Data.csv'
+df = pd.read_excel(file_path)
+
+print(df.head())
+
+
+explore data analysis
+----------
+import matplotlib.pyplot as pt
+import seaborn as sns
+
+sns.histplot(df['price'], kde=True)
+pt.title('Price Distribution')
+pt.show()
+
+sns.scatterplot(x='total_sqft', y='price', data=df)
+pt.title('Total Sqft vs Price')
+pt.show()
+
+pt.figure(figsize=(10, 8))
+sns.heatmap(df.corr(), annot=True, fmt='.2f', cmap='coolwarm')
+pt.title('Correlation Matrix')
+pt.show()
+
+feature engineering
+---------------------
+df_clean = df.dropna()
+
+df_clean = pd.get_dummies(df_clean)
+
+from sklearn.preprocessing import StandardScaler
+scaler = StandardScaler()
+
+X = df_clean.drop('price', axis=1)
+y = df_clean['price']
+
+X_scaled = scaler.fit_transform(X)
+
+
+SVM regressor
+-----------
+
+from sklearn.svm import SVR
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
+
+X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
+
+svm_regressor = SVR(kernel='linear')  # You can experiment with different kernels
+svm_regressor.fit(X_train, y_train)
+
+
+y_pred = svm_regressor.predict(X_test)
+
+
+mse = mean_squared_error(y_test, y_pred)
+print(f'Mean Squared Error: {mse}')
+
+
