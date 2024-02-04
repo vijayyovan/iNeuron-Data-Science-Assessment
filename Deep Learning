@@ -1,0 +1,83 @@
+
+
+import tensorflow as tf
+from tensorflow.keras import layers, models
+from tensorflow.keras.datasets import mnist
+from tensorflow.keras.utils import to_categorical
+
+Load and Prepare the MNIST Dataset
+=================
+# Load the MNIST dataset
+(train_images, train_labels), (test_images, test_labels) = mnist.load_data()
+
+# Normalize the images to 0-1 range
+train_images = train_images.astype('float32') / 255
+test_images = test_images.astype('float32') / 255
+
+# Reshape the images to include the channel dimension
+train_images = train_images.reshape((-1, 28, 28, 1))
+test_images = test_images.reshape((-1, 28, 28, 1))
+
+# Convert labels to one-hot encoding
+train_labels = to_categorical(train_labels)
+test_labels = to_categorical(test_labels)
+
+define the model
+----------------
+
+model = models.Sequential([
+
+# Convolutional layer with filters=16, kernel_size=3, activation='relu', input shape for MNIST (28x28 images with 1 channel)
+    
+layers.Conv2D(16, (3, 3), activation='relu', input_shape=(28, 28, 1)),
+
+# MaxPooling layer to reduce the spatial dimensions
+ 
+layers.MaxPooling2D((2, 2)),
+
+# Another Convolutional layer with filters=32 and kernel_size=3, activation='relu'
+    layers.Conv2D(32, (3, 3), activation='relu'),
+ 
+# MaxPooling layer to further reduce dimensions
+    layers.MaxPooling2D((2, 2)),
+  
+# Flatten layer to convert the 2D outputs to 1D before the dense layer
+    layers.Flatten(),
+ 
+ # Dense layer for output, 10 units for 10 classes, softmax activation for multi-class classification
+    layers.Dense(10, activation='softmax')
+])
+
+# Compile the model
+model.compile(optimizer='adam',
+              loss='categorical_crossentropy',
+              metrics=['accuracy'])
+
+model.summary()
+
+history = model.fit(train_images, train_labels, epochs=10, batch_size=64,
+                    validation_data=(test_images, test_labels))
+
+test_loss, test_acc = model.evaluate(test_images, test_labels)
+print(f"Test accuracy: {test_acc*100:.2f}%")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
